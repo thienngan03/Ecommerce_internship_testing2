@@ -1,5 +1,13 @@
-{
+{ "name": "ecommerce-internship-testing",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm test",
+    "client": "cd client && npm start",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
   "devDependencies": {
-    "@types/react-dom": "^19.1.6"
+    "@types/react-dom": "^19.1.6",
+    "concurrently": "^9.2.0"
   }
 }

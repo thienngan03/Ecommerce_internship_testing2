@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useEffect } from "react";
-import {useAuth} from "D:/Job_FinViet/Code_week2_mySql/client/src/Hooks/useAuth.tsx";
+import {useAuth} from "../Hooks/useAuth.tsx"; // Adjust the import path as necessary
 import { useNavigate } from "react-router";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -10,7 +10,7 @@ import {faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 
 
 import hero from "../Components/Assets/hero.png";
-import "D:/Job_FinViet/Code_week2_mySql/client/src/Pages/Login.css"; // Assuming you have a CSS file for styling
+import "./Login.css"; // Assuming you have a CSS file for styling
 
 const LogIn = () => {
   const [email, setEmail] = React.useState("");

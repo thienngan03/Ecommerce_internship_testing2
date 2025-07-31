@@ -1,5 +1,5 @@
 import {useEffect, useState } from 'react';
-import { useAuth } from 'D:/Job_FinViet/Code_week2_mySql/client/src/Hooks/useAuth.tsx';
+import { useAuth } from '../Hooks/useAuth.tsx';
 import { useNavigate } from 'react-router-dom';
 import hero from "../Components/Assets/hero.png";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";

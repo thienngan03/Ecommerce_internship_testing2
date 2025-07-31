@@ -1,17 +1,20 @@
 import './Navbar.css';
 import logo from '../Assets/logo.png'; // Adjust the path as necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faShoppingCart,  faShoppingBag,faUser, faGear, faShoppingBasket, faBagShopping, faHouse, faHouseChimney, faStore  } from '@fortawesome/free-solid-svg-icons';
-import  { useEffect, useState } from 'react';
+// import { faHome, faShoppingCart,  faShoppingBag,faUser, faGear, faShoppingBasket, faBagShopping, faHouse, faHouseChimney, faStore  } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faShoppingCart,  faShoppingBag,faUser, faGear, faStore  } from '@fortawesome/free-solid-svg-icons';
+// import  { useEffect, useState } from 'react';
+import  { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../Hooks/useAuth.tsx';
-import { getCartsByBuyerId } from '../../Api/buyerAPI.jsx';
+// import { getCartsByBuyerId } from '../../Api/buyerAPI.jsx';
 
 
 const Navbar = () => {
   const [menu, setMenu] = useState(null);
-  const { isAuthenticated, logout,user, buyerId } = useAuth();
-  const [cartCount, setCartCount] = useState(0);
+  const { isAuthenticated, logout,user} = useAuth();
+    // const { isAuthenticated, logout,user, buyerId } = useAuth();
+  // const [cartCount, setCartCount] = useState(0);
 
   const handleLogout = () => {
     logout();
