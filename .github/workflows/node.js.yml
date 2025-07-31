@@ -32,8 +32,13 @@ jobs:
     - name: Build client 
       working-directory: client
       run: npm run build --if-present
+    - name: Start client 
+      working-directory: client
+      run: npm start
     - name: Setup server 
       working-directory: server
       run: npm ci
-    - run: npm start
+    - name: Start server 
+      working-directory: server
+      run: npm test
 
