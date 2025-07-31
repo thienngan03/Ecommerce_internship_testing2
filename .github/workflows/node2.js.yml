@@ -30,7 +30,7 @@ jobs:
       working-directory: client
       run: npm ci
     - name: Install Dependencies
-      working-directory: client
+      working-directory: ./client
       run: npm i react-router-dom
     - name: Build client
       working-directory: client
