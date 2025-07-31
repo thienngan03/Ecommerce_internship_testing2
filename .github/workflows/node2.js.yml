@@ -26,6 +26,12 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - name: Setup client 
+      working-directory: client
+      run: npm ci
+    - name: Start client 
+      working-directory: client
+      run: npm test
     - name: Setup server 
       working-directory: server
       run: npm ci
