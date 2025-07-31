@@ -29,6 +29,9 @@ jobs:
     - name: Setup client 
       working-directory: client
       run: npm ci
+    - name: Install Dependencies
+      working-directory: client
+      run: npm install
     - name: Start client 
       working-directory: client
       run: npm test
