@@ -1,4 +1,4 @@
-const { where } = require("sequelize");
+const { where, or } = require("sequelize");
 const {models}= require("../models/index.js");
 const reuse = require("../reuse/reuse.js");
 
@@ -288,7 +288,7 @@ class BuyerController {
                 description: "Payment for order" + `order-${Date.now()}`,
                 payment_type: "05",
                 currency: "USD",
-                redirect_url: `http://localhost:3000/buyer/cart`,
+                redirect_url: `http://localhost:3000/buyer/order`,
                 store_label: process.env.STORE,
                 store_code: process.env.STORE,
                 terminal_label: process.env.STORE,
@@ -300,7 +300,18 @@ class BuyerController {
             };
             const signature = reuse.createSignature(transaction);
             transaction.signature = signature;
-            return res.status(200).json({transaction});
+
+            const response = await fetch(`https://mgw-test.finviet.com.vn:6868/api/v1/payment/init`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                ...transaction,
+              }),
+            });
+            const result = await response.json();
+            return res.status(200).json({result});
         } catch (error) {
             console.error("Error preparing transaction:", error);
             return res.status(500).json({message: "Internal server error"});
@@ -322,7 +333,54 @@ class BuyerController {
             return res.status(500).json({message: "Internal server error"});
         }
     }
+    checkTransaction = async (req, res) => {
+        try {
+            const {buyerId, orderId} = req.params;
+            const {transactionUrl} = req.body;
+            const order = await models.Order.findOne({
+                where: {buyerId, id: orderId},
+            });
+            if (!order) {
+                return res.status(404).json({message: "Order not found"});
+            }
+            const paresUrl = new URL(transactionUrl); // Create a URL object from the payment_url
+            const fv_payment_transid = paresUrl.searchParams.get('fv_payment_transid');
 
+            let status = "initial"
+            let checkTrans = setInterval(async () => {
+             const response = await fetch(`https://egw-test.finviet.com.vn:6868/api/v2/payment/checktrans`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        fv_payment_transid: fv_payment_transid,
+                        transaction_type:"payment",
+                    }),
+                });
+                const result = await response.json();
+                if (result.data.status === "success") {
+                    clearInterval(checkTrans);
+                    status = "success";
+                    order.status = "pending";
+                    await order.save();
+                    return res.status(200).json({status});
+                }
+            }, 1000);
+            setTimeout(() => {
+                clearInterval(checkTrans);
+                if (status === "initial") {
+                    status = "failed";
+                }
+            return res.status(200).json({status});
+            },  1800000); // Stop checking after 30 minutes
+
+
+        } catch (error) {
+            console.error("Error checking transaction:", error);
+            return res.status(500).json({message: "Internal server error"});
+        }
+    }
     getShopsByShopId = async (req, res) => {
         try {
             const buyerId = req.params.buyerId;

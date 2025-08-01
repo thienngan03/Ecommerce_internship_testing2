@@ -18,6 +18,7 @@ const upload = require('../middleware/upload');
     router.post('/:buyerId/checkout', buyerController.checkout);
     router.post('/:buyerId/prepareTransaction', buyerController.prepareTransaction);
     router.put("/:buyerId/updateTransaction/:orderId", buyerController.updateTransaction);
+    router.post('/:buyerId/checkTransaction/:orderId', buyerController.checkTransaction);
     router.get('/:buyerId/orders', buyerController.getOrdersByBuyerId);
     router.get('/:buyerId/order/:orderId', buyerController.getOrderById);
 module.exports = router;
