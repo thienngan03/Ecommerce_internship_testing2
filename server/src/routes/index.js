@@ -11,6 +11,9 @@ function routes(app) {
     app.use('/seller', seller);
     app.use('/buyer', buyer);
     app.use('/', guest);
+    app.get('/test', (req, res) => {
+        res.status(200).send('Test route is working');
+    });
 
 }
 

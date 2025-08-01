@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {loginRequest, registerRequest, logoutRequest} from '../Api/authAPI'
 import axios from 'axios';
-import {getBuyer} from '../Api/buyerAPI';
+import {getBuyer, getCartsByBuyerId} from '../Api/buyerAPI';
 import {getSeller, getShopByAccountId} from '../Api/sellerAPI';
 import {jwtDecode} from 'jwt-decode';
 
@@ -21,6 +21,7 @@ type AuthContextType = {
     buyerId?: string | null;
     sellerId?: string | null;
     shopId?: string | null;
+    cartCount?: number;
 
 };
 
@@ -36,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [buyerId, setBuyerId] = useState<string | null>(null);
     const [sellerId, setSellerId] = useState<string | null>(null);
     const [shopId, setShopId] = useState<string | null>(null);
+    const [cartCount, setCartCount] = useState<number>(0);
 
     useEffect(() => {
         const checkSession = async () => {
@@ -46,9 +48,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const buyerId = localStorage.getItem("buyerId");
                 const sellerId = localStorage.getItem("sellerId");
                 const shopId = localStorage.getItem("shopId");
+                const cartCount = localStorage.getItem("cartCount");
                 setBuyerId(buyerId);
                 setSellerId(sellerId);
                 setShopId(shopId);
+                setCartCount(cartCount ? parseInt(cartCount) : 0);
                 const decodedToken = token ? jwtDecode(token) as { exp: number } : null;
                 const currentTime = Date.now() / 1000; 
                 if (decodedToken && decodedToken.exp < currentTime) {
@@ -57,6 +61,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     localStorage.removeItem("buyerId");
                     localStorage.removeItem("sellerId");
                     localStorage.removeItem("shopId");
+                    localStorage.removeItem("cartCount");
+                    
 
                     setIsAuthenticated(false);
                     setUser(null);
@@ -100,12 +106,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('user', JSON.stringify(userData));
       setIsAuthenticated(true);
       setError('');
-
       if (userData.role === 'buyer') {
         const buyer = await getBuyer(userData.id);
         localStorage.setItem('buyerId', buyer.id);
         setBuyerId(buyer.id);
-        console.log( buyerId);
+
+        const carts = await getCartsByBuyerId(buyer.id);
+        localStorage.setItem('cartCount', carts.carts.length.toString());
+        setCartCount(carts.carts.length);
+
       }
       if (userData.role === 'seller') {
         const seller = await getSeller(userData.id);
@@ -114,7 +123,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const shop = await getShopByAccountId(userData.id);
         localStorage.setItem('shopId', shop.id);
         setShopId(shop.id);
-        console.log('Shop ID:', shopId);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -166,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ login, logout, register, user, isAuthenticated, token, error: error , loading, buyerId, sellerId, shopId }}>
+    <AuthContext.Provider value={{ login, logout, register, user, isAuthenticated, token, error: error , loading, buyerId, sellerId, shopId, cartCount }}>
       {children}
     </AuthContext.Provider>
   );

@@ -7,32 +7,27 @@ import { faHome, faShoppingCart,  faShoppingBag,faUser, faGear, faStore  } from 
 import  { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../Hooks/useAuth.tsx';
+import { useNavigate } from "react-router-dom"
+import { useEffect } from 'react';
 // import { getCartsByBuyerId } from '../../Api/buyerAPI.jsx';
 
 
 const Navbar = () => {
   const [menu, setMenu] = useState(null);
-  const { isAuthenticated, logout,user} = useAuth();
-    // const { isAuthenticated, logout,user, buyerId } = useAuth();
-  // const [cartCount, setCartCount] = useState(0);
+  const { isAuthenticated, logout,user } = useAuth();
+  const navigate = useNavigate();
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+      if (!isAuthenticated || !user) {
+        navigate('/login');
+      }
+      setCartCount(parseInt(localStorage.getItem("cartCount")) || 0);
+  }, [isAuthenticated, user, navigate]);
 
   const handleLogout = () => {
     logout();
   };
-// useEffect(() => {
-//     const fetchCartCount = () => {
-//       if (user && user.role === 'buyer') {
-//         const carts = getCartsByBuyerId(buyerId);
-//         if (carts && carts.products) {
-//           setCartCount(carts.products.length);
-//         }
-//         else {
-//           setCartCount(0);
-//         }
-//       }
-//     };
-//     fetchCartCount();
-//   }, [user, buyerId]);
 
   return (
     <nav className="navbar">
@@ -64,7 +59,7 @@ const Navbar = () => {
         {user && user.role === 'buyer' && (
           <Link to="/buyer/cart" className="cart-icon">
             <FontAwesomeIcon icon={faShoppingCart} />
-            {/* <div className="cart-count">{cartCount}</div> */}
+            <div className="cart-count">{cartCount}</div>
           </Link>
         )}
         { user && user.role === 'seller' && (
