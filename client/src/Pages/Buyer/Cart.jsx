@@ -4,7 +4,7 @@ import "./Cart.css"
 import { useEffect, useState } from "react";
 import { useAuth } from "../../Hooks/useAuth.tsx";
 import { useNavigate } from "react-router-dom";
-import { getCartsByBuyerId, updateCart,prepareTransaction, checkout, updateTransaction } from "../../Api/buyerAPI.jsx";
+import { getCartsByBuyerId, updateCart,prepareTransaction, checkout, checkTrans } from "../../Api/buyerAPI.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCancel } from "@fortawesome/free-solid-svg-icons";
 
@@ -25,32 +25,7 @@ export const Cart = () => {
     const fetchCartItems = async () => {
       if (isAuthenticated && buyerId) {
         setLoadingCart(true);
-        try {
-            const path = window.location;
-            const parsedUrl = new URL(path);
-            const status = parsedUrl.searchParams.get('status');
-            
-            if (status) {
-              const orderId = parsedUrl.searchParams.get('order_id');
-              if (status === "success") {
-                const id = Number(orderId);
-                const response = await updateTransaction(buyerId, id);
-                if (response) {
-                  alert("Checkout successful!");
-                  navigate('/buyer/order');
-                  return;
-                } else {
-                  console.error("Error during checkout:", response);
-                  alert("Checkout failed. Please try again.");
-                  navigate('/buyer/cart');
-                  return;
-                }
-              } else {
-                alert("Transaction failed. Please try again.");
-                navigate('/buyer/order');
-                return;
-              }
-            } else {
+        try {  
              setTimeout(async() => {
                 const data = await getCartsByBuyerId(buyerId);
                 setCartItems(data.carts || []);
@@ -60,8 +35,6 @@ export const Cart = () => {
                 setCheckAll(false);
                 setLoadingCart(false);
              }, 1000);
-            }
-         
         } catch (error) {
           console.error("Error fetching cart items:", error);
         }
@@ -147,17 +120,9 @@ export const Cart = () => {
         const response = await prepareTransaction(buyerId, transactionData);
         setLoadingCheckout(false);
         if (response) {
-            const res = await fetch(`https://mgw-test.finviet.com.vn:6868/api/v1/payment/init`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                ...response.transaction,
-              }),
-            });
-            const result = await res.json();
-            window.location= result.data.payment_url;
+          window.location= response.result.data.payment_url;
+
+          await checkTrans(buyerId, order.order.id, response.result.data.payment_url);
         } else {
           alert("Checkout failed: " + response.message);
         }

@@ -104,6 +104,15 @@ export const prepareTransaction = async (buyerId, transactionData) => {
         throw error;
     }
 }
+export const checkTrans = async (buyerId, orderId, transactionUrl) => {
+    try {
+        const response = await api.post(`/buyer/${buyerId}/checkTransaction/${orderId}`, { transactionUrl });
+        return response.data;
+    } catch (error) {
+        console.error("Error checking transaction:", error);
+        throw error;
+    }
+}
 export const updateTransaction = async (buyerId, orderId) => {
     try {
         const response = await api.put(`/buyer/${buyerId}/updateTransaction/${orderId}`);

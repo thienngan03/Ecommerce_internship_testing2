@@ -1,6 +1,5 @@
-const {where, json, Op} = require('sequelize');
+const { Op} = require('sequelize');
 const {models}= require("../models/index.js");
-const { or } = require("sequelize");
 const reuse = require("../reuse/reuse.js");
 
 
