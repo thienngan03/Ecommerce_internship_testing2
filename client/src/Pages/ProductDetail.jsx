@@ -68,8 +68,17 @@ const ProductDetail = () => {
           productId: product.id,
           quantity: quantity,
         };
-        await addToCart(buyerId, cartData);
-        alert("Product added to cart successfully!");
+        const response = await addToCart(buyerId, cartData);
+        if (response) {
+          alert("Product added to cart successfully!");
+          // Optionally, you can update the cart count in the auth context or local storage
+          // setCartCount(prevCount => prevCount + quantity);
+          if (!response.isExit) {
+            const currentCount = parseInt(localStorage.getItem("cartCount")) || 0;
+            localStorage.setItem("cartCount", (currentCount + 1).toString());
+          }
+          navigate(`/buyer/cart`);
+        }
       } catch (error) {
         console.error("Error adding product to cart:", error);
         alert("Failed to add product to cart.");

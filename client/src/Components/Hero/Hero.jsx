@@ -8,7 +8,7 @@ const Hero = () => {
   return (
     <div className="hero">
       <div className="hero-left">
-        <h2>Welcome to Our E-Shop</h2>
+        <h2 className="hero-title">Welcome to Our E-Shop</h2>
           <div>
             <div className="star-icon">
               <p>New Collections for everyone</p>

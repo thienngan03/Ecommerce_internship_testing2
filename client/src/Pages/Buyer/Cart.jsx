@@ -34,6 +34,7 @@ export const Cart = () => {
                 setProductIds([]);
                 setCheckAll(false);
                 setLoadingCart(false);
+                localStorage.setItem("cartCount", (data.carts.length).toString());
              }, 1000);
         } catch (error) {
           console.error("Error fetching cart items:", error);
@@ -47,7 +48,7 @@ export const Cart = () => {
   if (loading || loadingCart) {
     return <div>Loading...</div>;
   }
-  if (!isAuthenticated) {
+  if (!isAuthenticated ) {
     navigate('/login');
   }
   if (cartItems.length === 0) {
@@ -58,18 +59,19 @@ export const Cart = () => {
   }
 
   const handleUpdateCart = async (productId, quantity) => {
+    setLoadingCart(true);
     try {
       const updatedCart = {
         productId,
         quantity
       }
+
       const response = await updateCart(buyerId, updatedCart);
-      if (response.success) {
-        setCartItems(prevItems =>
-          prevItems.map(item =>
-            item.productId === productId ? { ...item, quantity } : item
-          )
-        );
+      if (response) {
+        setLoadingCart(false);
+        const newCartItems = await getCartsByBuyerId(buyerId);
+        setCartItems(newCartItems.carts || []);
+        localStorage.setItem("cartCount", (newCartItems.carts.length).toString());
       } else {
         console.error("Error updating cart:", response.message);
       }
@@ -104,9 +106,10 @@ export const Cart = () => {
             alert("Checkout failed. Please try again.");
             return;
           }
-
         if (payment === "cash") {
           setLoadingCheckout(false);
+          const 
+                          localStorage.setItem("cartCount", (data.carts.length).toString());
           alert("Checkout successful! Please pay in cash upon delivery.");
           navigate('/buyer/order');
           return;
@@ -135,6 +138,10 @@ export const Cart = () => {
       navigate('/login');
     }
   };
+    const handleClickCard = (productId) => {
+
+      navigate(`/products/${productId}`); // Replace '1' with the actual product ID
+    }
 
   return (
     <div className="cart">
@@ -169,6 +176,7 @@ export const Cart = () => {
                   className="product-image"
                   src={product?.imageUrl || "placeholder.png"}
                   alt={product?.name || "Product Image"}
+                  onClick={() => handleClickCard(product.id)}
                 />
                 <div className="cart-item-info">
                   <div className="text-wrapper">{product?.name || "Product Name"}</div>

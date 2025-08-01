@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --require @babel/register",
+    "test": "mocha --timeout 10000 ",
     "start": "nodemon server.js",
     "dev": "nodemon server.js"
   },
@@ -31,7 +31,16 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+<<<<<<< Updated upstream
     "mocha": "^11.7.1",
     "nodemon": "^3.1.10"
   }
+=======
+    "chai-http": "^5.1.2",
+    "mocha": "^11.7.1",
+    "nodemon": "^3.1.10",
+    "vitest": "^3.2.4"
+  },
+  "type": "commonjs"
+>>>>>>> Stashed changes
 }

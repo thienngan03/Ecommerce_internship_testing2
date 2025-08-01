@@ -106,6 +106,7 @@ class BuyerController {
         try {
             const {productId, quantity} = req.body;
             const buyerId = req.params.buyerId;
+            let isExit = false;
 
             const product = await models.Product.findByPk(productId, { where: {isActive: true} });
             if (!product || !product.isActive) {
@@ -118,22 +119,22 @@ class BuyerController {
                 where: {buyerId, productId,isActive: true}
             });
             if (existingCart) {
+
                 const newQuantity = Number(existingCart.quantity) + Number(quantity);
-                console.log(typeof newQuantity, newQuantity);
-                console.log("Existing cart found:", newQuantity);
                 if (newQuantity > product.stock) {
                     return res.status(400).json({message: "Insufficient stock"});
                 }
                 existingCart.quantity = newQuantity;
                 await existingCart.save();
-                return res.status(200).json(existingCart);
+                isExit = true;
+                return res.status(200).json({existingCart,isExit});
             }
             const cart = await models.Cart.create({
                 buyerId,
                 productId,
                 quantity,
             });
-            return res.status(201).json(cart);
+            return res.status(201).json({cart, isExit});
         } catch (error) {
             console.error("Error adding to cart:", error);
             return res.status(500).json({message: "Internal server error"});
