@@ -108,8 +108,6 @@ export const Cart = () => {
           }
         if (payment === "cash") {
           setLoadingCheckout(false);
-          const 
-                          localStorage.setItem("cartCount", (data.carts.length).toString());
           alert("Checkout successful! Please pay in cash upon delivery.");
           navigate('/buyer/order');
           return;
